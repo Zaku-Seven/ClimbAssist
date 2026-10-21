@@ -3,13 +3,13 @@ The Climbers
 
 # Members
 
-| Name | Title | GitHub | LinkedIn |
+| Name | GitHub | LinkedIn |
 |---|---|---|---|
 | Steven Rocca    |  Product Owner | [@stevenrocca3](https://github.com/stevenrocca3) | [Steven Rocca](https://www.linkedin.com/in/steven-rocca3/)     |
-| Denys Tsinyk    |   Scrum Master | [@denystsinyk](https://github.com/denystsinyk) | [Denys Tsinyk](https://www.linkedin.com/in/denystsinyk/)   |
+| Denys Tsinyk    |   Scrum Master | [Github User Here](Github URL Here)              | [Denys Tsinyk](LinkedIn Link here)                             |
 | Roger Torres    |    Developer   | [Github User Here](Github URL Here)              | [Roger Torres](LinkedIn Link here)                             |
 | Samuel Gombiner |    Developer   | [Github User Here](Github URL Here)              | [Samuel Gombiner](LinkedIn Link here)                          |
-| Jayson Dang     |    Developer   | [Github User Here](Github URL Here)              | [Jayson Dang](LinkedIn Link here)                              |
+| Jayson Dang     |    Developer   | [@Zaku-Seven](https://github.com/Zaku-Seven)     | [Jayson Dang](https://www.linkedin.com/in/jbdang/)                              |
 
 # Project Purpose
 Help PittRec Center climbers by analyzing pictures of the climbing wall courses to display the most effective algorithm for completion.
