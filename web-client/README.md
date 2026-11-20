@@ -31,7 +31,3 @@ Choose a JPEG or PNG up to 10 MB, check the preview, then choose Analyze. The pa
 `x` and `y` are fractions of the image, from 0 to 1. The page numbers those holds and highlights the current move. Back and Next move one step at a time.
 
 Use Sample wall to skip the upload and show `public/fixtures/sample-wall.png` with `public/fixtures/sample-route.json`. That path does not need the application server.
-
-## GenAI
-
-Cursor was used while drafting the upload and step-through page in `src/App.tsx` and `src/index.css`, and while making the sample fixture. Jayson Dang reviewed the change.
