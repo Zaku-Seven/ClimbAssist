@@ -1,0 +1,74 @@
+{
+  "imageWidth": 640,
+  "imageHeight": 880,
+  "holds": [
+    {
+      "id": "h1",
+      "x": 0.46,
+      "y": 0.86,
+      "order": 1
+    },
+    {
+      "id": "h2",
+      "x": 0.3,
+      "y": 0.74,
+      "order": 2
+    },
+    {
+      "id": "h3",
+      "x": 0.64,
+      "y": 0.66,
+      "order": 3
+    },
+    {
+      "id": "h4",
+      "x": 0.38,
+      "y": 0.54,
+      "order": 4
+    },
+    {
+      "id": "h5",
+      "x": 0.58,
+      "y": 0.4,
+      "order": 5
+    },
+    {
+      "id": "h6",
+      "x": 0.47,
+      "y": 0.24,
+      "order": 6
+    }
+  ],
+  "moves": [
+    {
+      "step": 1,
+      "holdId": "h1",
+      "limb": "Right hand to hold 1"
+    },
+    {
+      "step": 2,
+      "holdId": "h2",
+      "limb": "Left hand to hold 2"
+    },
+    {
+      "step": 3,
+      "holdId": "h3",
+      "limb": "Right foot to hold 3"
+    },
+    {
+      "step": 4,
+      "holdId": "h4",
+      "limb": "Left hand to hold 4"
+    },
+    {
+      "step": 5,
+      "holdId": "h5",
+      "limb": "Right hand to hold 5"
+    },
+    {
+      "step": 6,
+      "holdId": "h6",
+      "limb": "Left hand to the top hold"
+    }
+  ]
+}

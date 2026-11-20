@@ -12,23 +12,134 @@ body {
 }
 
 main {
-  min-height: 100vh;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 24px;
+  width: min(100%, 32rem);
+  margin: 0 auto;
+  padding: 24px 16px 40px;
 }
 
 h1 {
-  margin: 0 0 12px;
-  font-size: 2.5rem;
+  margin: 0 0 8px;
+  font-size: 2rem;
   font-weight: 600;
 }
 
-p {
+.intro,
+.hint,
+.step,
+.limb,
+.notice,
+.error {
   margin: 0;
+}
+
+.intro {
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #e7e0d6;
+  border-radius: 16px;
+}
+
+.file-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.hint {
+  color: #57534e;
+  font-size: 0.95rem;
+}
+
+.error {
+  color: #9f1239;
+}
+
+.notice {
+  padding: 10px 12px;
+  background: #fef3c7;
+  border-radius: 10px;
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px;
+  background: #3f6212;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+}
+
+button.secondary {
+  background: #e7e5e4;
+  color: #1c1917;
+}
+
+button:disabled {
+  opacity: 0.45;
+}
+
+.preview,
+.stage img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.hold {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  margin-left: -16px;
+  margin-top: -16px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #1c1917;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.hold.current {
+  width: 40px;
+  height: 40px;
+  margin-left: -20px;
+  margin-top: -20px;
+  background: #facc15;
+  outline: 3px solid #1c1917;
+}
+
+.step {
+  font-weight: 600;
+}
+
+.limb {
   font-size: 1.125rem;
 }
