@@ -7,8 +7,8 @@ export type Hold = {
   height: number
 }
 
-function isUnit(value: unknown): value is number {
-  return typeof value === 'number' && Number.isFinite(value)
+function isFraction(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1
 }
 
 function isHold(value: unknown): value is Hold {
@@ -16,14 +16,17 @@ function isHold(value: unknown): value is Hold {
     return false
   }
   const hold = value as Record<string, unknown>
-  return (
-    typeof hold.id === 'string' &&
-    typeof hold.color === 'string' &&
-    isUnit(hold.x) &&
-    isUnit(hold.y) &&
-    isUnit(hold.width) &&
-    isUnit(hold.height)
-  )
+  if (
+    typeof hold.id !== 'string' ||
+    typeof hold.color !== 'string' ||
+    !isFraction(hold.x) ||
+    !isFraction(hold.y) ||
+    !isFraction(hold.width) ||
+    !isFraction(hold.height)
+  ) {
+    return false
+  }
+  return hold.x + hold.width <= 1 && hold.y + hold.height <= 1
 }
 
 export function parseHolds(value: unknown): Hold[] | null {
