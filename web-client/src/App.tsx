@@ -2,27 +2,16 @@ import { useEffect, useState, type ChangeEvent } from 'react'
 
 const DEFAULT_API_URL = 'http://localhost:8000'
 const SAMPLE_IMAGE = '/fixtures/sample-wall.png'
-const SAMPLE_ROUTE = '/fixtures/sample-route.json'
+const SAMPLE_HOLDS = '/fixtures/sample-holds.json'
 const MAX_BYTES = 10 * 1024 * 1024
 
 type Hold = {
   id: string
+  color: string
   x: number
   y: number
-  order: number
-}
-
-type Move = {
-  step: number
-  holdId: string
-  limb: string
-}
-
-type RouteSolution = {
-  imageWidth: number
-  imageHeight: number
-  holds: Hold[]
-  moves: Move[]
+  width: number
+  height: number
 }
 
 function apiBaseUrl(): string {
@@ -35,6 +24,10 @@ function isJpegOrPng(file: File): boolean {
   return file.type === 'image/jpeg' || file.type === 'image/png'
 }
 
+function isUnit(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value)
+}
+
 function isHold(value: unknown): value is Hold {
   if (typeof value !== 'object' || value === null) {
     return false
@@ -42,55 +35,35 @@ function isHold(value: unknown): value is Hold {
   const hold = value as Record<string, unknown>
   return (
     typeof hold.id === 'string' &&
-    typeof hold.x === 'number' &&
-    typeof hold.y === 'number' &&
-    typeof hold.order === 'number'
+    typeof hold.color === 'string' &&
+    isUnit(hold.x) &&
+    isUnit(hold.y) &&
+    isUnit(hold.width) &&
+    isUnit(hold.height)
   )
 }
 
-function isMove(value: unknown): value is Move {
-  if (typeof value !== 'object' || value === null) {
-    return false
-  }
-  const move = value as Record<string, unknown>
-  return (
-    typeof move.step === 'number' &&
-    typeof move.holdId === 'string' &&
-    typeof move.limb === 'string'
-  )
-}
-
-function parseRoute(value: unknown): RouteSolution | null {
+function parseHolds(value: unknown): Hold[] | null {
   if (typeof value !== 'object' || value === null) {
     return null
   }
-  const route = value as Record<string, unknown>
-  if (!Array.isArray(route.holds) || !Array.isArray(route.moves)) {
+  const body = value as Record<string, unknown>
+  if (!Array.isArray(body.holds) || !body.holds.every(isHold)) {
     return null
   }
-  if (!route.holds.every(isHold) || !route.moves.every(isMove)) {
-    return null
-  }
-  const imageWidth = typeof route.imageWidth === 'number' ? route.imageWidth : 0
-  const imageHeight = typeof route.imageHeight === 'number' ? route.imageHeight : 0
-  return {
-    imageWidth,
-    imageHeight,
-    holds: [...route.holds].sort((a, b) => a.order - b.order),
-    moves: [...route.moves].sort((a, b) => a.step - b.step),
-  }
+  return body.holds
 }
 
-async function loadSampleRoute(): Promise<RouteSolution> {
-  const response = await fetch(SAMPLE_ROUTE)
+async function loadSampleHolds(): Promise<Hold[]> {
+  const response = await fetch(SAMPLE_HOLDS)
   if (!response.ok) {
-    throw new Error('Sample route is missing')
+    throw new Error('Sample holds are missing')
   }
-  const route = parseRoute(await response.json())
-  if (!route) {
-    throw new Error('Sample route is invalid')
+  const holds = parseHolds(await response.json())
+  if (!holds) {
+    throw new Error('Sample holds are invalid')
   }
-  return route
+  return holds
 }
 
 async function readError(response: Response): Promise<string> {
@@ -114,8 +87,7 @@ function App() {
   const [file, setFile] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [imageSrc, setImageSrc] = useState<string | null>(null)
-  const [solution, setSolution] = useState<RouteSolution | null>(null)
-  const [stepIndex, setStepIndex] = useState(0)
+  const [holds, setHolds] = useState<Hold[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -128,9 +100,8 @@ function App() {
   }, [previewUrl])
 
   function resetResult() {
-    setSolution(null)
+    setHolds(null)
     setImageSrc(null)
-    setStepIndex(0)
     setNotice(null)
   }
 
@@ -156,10 +127,9 @@ function App() {
   }
 
   async function showSample(message: string) {
-    const route = await loadSampleRoute()
-    setSolution(route)
+    const sample = await loadSampleHolds()
+    setHolds(sample)
     setImageSrc(SAMPLE_IMAGE)
-    setStepIndex(0)
     setNotice(message)
   }
 
@@ -173,38 +143,42 @@ function App() {
     setNotice(null)
     try {
       const body = new FormData()
-      body.append('image', file)
-      const response = await fetch(`${apiBaseUrl()}/analyze`, {
+      body.append('file', file)
+      const response = await fetch(`${apiBaseUrl()}/api/holds/detect`, {
         method: 'POST',
         body,
       })
-      if (response.status === 400) {
+      if (response.status === 400 || response.status === 413) {
         setError(await readError(response))
         return
       }
       if (!response.ok) {
         await showSample(
-          'Sample route. The server has no analysis result yet, so this is the demo wall rather than your photo.',
+          'Sample holds. The detection service is not available yet, so this is the demo wall rather than your photo.',
         )
         return
       }
-      const route = parseRoute(await response.json())
-      if (!route) {
+      const detected = parseHolds(await response.json())
+      if (!detected) {
         await showSample(
-          'Sample route. The server response was not a route, so this is the demo wall rather than your photo.',
+          'Sample holds. The server response was not a hold list, so this is the demo wall rather than your photo.',
         )
         return
       }
-      setSolution(route)
+      setHolds(detected)
       setImageSrc(previewUrl)
-      setStepIndex(0)
+      setNotice(
+        detected.length === 0
+          ? 'No holds found. Retake the photo.'
+          : null,
+      )
     } catch {
       try {
         await showSample(
-          'Sample route. The server could not be reached, so this is the demo wall rather than your photo.',
+          'Sample holds. The server could not be reached, so this is the demo wall rather than your photo.',
         )
       } catch {
-        setError('The sample route could not be loaded.')
+        setError('The sample holds could not be loaded.')
       }
     } finally {
       setBusy(false)
@@ -215,9 +189,9 @@ function App() {
     setBusy(true)
     setError(null)
     try {
-      await showSample('Sample route. These holds are demo data, not detected from a photo.')
+      await showSample('Sample holds. These boxes are demo data, not detected from a photo.')
     } catch {
-      setError('The sample route could not be loaded.')
+      setError('The sample holds could not be loaded.')
     } finally {
       setBusy(false)
     }
@@ -234,14 +208,11 @@ function App() {
     }
   }
 
-  const move = solution?.moves[stepIndex]
-  const currentHoldId = move?.holdId
-
   return (
     <main>
       <h1>ClimbAssist</h1>
       <p className="intro">
-        Upload a photo of the wall, then step through one numbered way to climb it.
+        Upload a photo of the wall. Detected holds are outlined so you can see what the photo contains.
       </p>
 
       <section className="card">
@@ -255,63 +226,49 @@ function App() {
             onChange={onFile}
           />
         </label>
-        <p className="hint">JPEG or PNG, up to 10 MB. You can replace the photo before analyzing it.</p>
+        <p className="hint">JPEG or PNG, up to 10 MB. You can replace the photo before detecting holds.</p>
 
         {error ? <p className="error">{error}</p> : null}
 
         <div className="actions">
           <button type="button" onClick={onAnalyze} disabled={busy || !file}>
-            {busy ? 'Working...' : 'Analyze'}
+            {busy ? 'Working...' : 'Detect holds'}
           </button>
           <button type="button" className="secondary" onClick={onUseSample} disabled={busy}>
             Use sample wall
           </button>
         </div>
 
-        {previewUrl && !solution ? (
+        {previewUrl && !holds ? (
           <img className="preview" src={previewUrl} alt="Selected wall" />
         ) : null}
 
-        {solution && imageSrc ? (
+        {holds && imageSrc ? (
           <div className="result">
             {notice ? <p className="notice">{notice}</p> : null}
             <div className="stage">
-              <img src={imageSrc} alt="Climbing wall with numbered holds" />
-              {solution.holds.map((hold) => (
+              <img src={imageSrc} alt="Climbing wall with outlined holds" />
+              {holds.map((hold) => (
                 <span
                   key={hold.id}
-                  className={hold.id === currentHoldId ? 'hold current' : 'hold'}
-                  style={{ left: `${hold.x * 100}%`, top: `${hold.y * 100}%` }}
+                  className="hold"
+                  style={{
+                    left: `${hold.x * 100}%`,
+                    top: `${hold.y * 100}%`,
+                    width: `${hold.width * 100}%`,
+                    height: `${hold.height * 100}%`,
+                    borderColor: hold.color,
+                  }}
+                  title={`${hold.id} ${hold.color}`}
                 >
-                  {hold.order}
+                  <span className="hold-id">{hold.id}</span>
                 </span>
               ))}
             </div>
-            {move ? (
-              <>
-                <p className="step">
-                  Step {stepIndex + 1} of {solution.moves.length}
-                </p>
-                <p className="limb">{move.limb}</p>
-              </>
-            ) : (
-              <p className="limb">No sequence was returned for this photo.</p>
-            )}
+            <p className="summary">
+              {holds.length === 0 ? 'No holds outlined.' : `${holds.length} holds outlined.`}
+            </p>
             <div className="actions">
-              <button
-                type="button"
-                onClick={() => setStepIndex((index) => index - 1)}
-                disabled={!move || stepIndex === 0}
-              >
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={() => setStepIndex((index) => index + 1)}
-                disabled={!move || stepIndex >= solution.moves.length - 1}
-              >
-                Next
-              </button>
               <button type="button" className="secondary" onClick={onStartOver}>
                 Start over
               </button>

@@ -114,32 +114,25 @@ button:disabled {
 
 .hold {
   position: absolute;
-  width: 32px;
-  height: 32px;
-  margin-left: -16px;
-  margin-top: -16px;
-  display: grid;
-  place-items: center;
+  box-sizing: border-box;
   border: 2px solid #1c1917;
-  border-radius: 50%;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.hold-id {
+  position: absolute;
+  top: -0.2rem;
+  left: 0;
+  padding: 0 3px;
   background: #fff;
-  font-size: 0.85rem;
+  color: #1c1917;
+  font-size: 0.7rem;
   font-weight: 700;
+  line-height: 1.2;
 }
 
-.hold.current {
-  width: 40px;
-  height: 40px;
-  margin-left: -20px;
-  margin-top: -20px;
-  background: #facc15;
-  outline: 3px solid #1c1917;
-}
-
-.step {
+.summary {
+  margin: 0;
   font-weight: 600;
-}
-
-.limb {
-  font-size: 1.125rem;
 }
