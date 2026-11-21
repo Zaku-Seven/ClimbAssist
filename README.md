@@ -112,6 +112,22 @@ To check both components together, start the application server, then the web cl
 
 For details on `VITE_API_URL` and other setup options, see the [Web Client README](web-client/README.md).
 
+## Automated checks
+
+Pull requests targeting `main` run the [CI workflow](.github/workflows/ci.yml).
+It compiles the FastAPI server, tests the `GET /health` response, and builds the
+React client. A next check could exercise photo upload and hold detection together.
+
+From `application-server/`, with the server dependencies already installed and
+the virtual environment active:
+
+```bash
+python -m pip install -r requirements-test.txt
+python -m unittest discover -s tests -v
+```
+
+From `web-client/`, run `npm ci` and `npm run build` to check the client build.
+
 # What Works / What Doesn't
 
 **Works**
